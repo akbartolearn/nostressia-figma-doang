@@ -114,15 +114,25 @@ function AppRouter() {
         <Route element={<AdminProtectedRoute />}>
             <Route path="/admin" element={<AdminDashboardRoute />} />
             <Route path="/admin/motivations" element={<AdminMotivationsRoute />} />
-            <Route path="/admin/motivations/:theme" element={<AdminMotivationsRoute />} />
+            <Route path="/admin/motivations/light" element={<AdminMotivationsRoute />} />
+            <Route path="/admin/motivations/dark" element={<AdminMotivationsRoute />} />
+            <Route path="/admin/motivations/system" element={<AdminMotivationsRoute />} />
             <Route path="/admin/tips" element={<AdminTipsRoute />} />
-            <Route path="/admin/tips/:theme" element={<AdminTipsRoute />} />
+            <Route path="/admin/tips/light" element={<AdminTipsRoute />} />
+            <Route path="/admin/tips/dark" element={<AdminTipsRoute />} />
+            <Route path="/admin/tips/system" element={<AdminTipsRoute />} />
             <Route path="/admin/users" element={<AdminUsersRoute />} />
-            <Route path="/admin/users/:theme" element={<AdminUsersRoute />} />
+            <Route path="/admin/users/light" element={<AdminUsersRoute />} />
+            <Route path="/admin/users/dark" element={<AdminUsersRoute />} />
+            <Route path="/admin/users/system" element={<AdminUsersRoute />} />
             <Route path="/admin/diaries" element={<AdminDiariesRoute />} />
-            <Route path="/admin/diaries/:theme" element={<AdminDiariesRoute />} />
+            <Route path="/admin/diaries/light" element={<AdminDiariesRoute />} />
+            <Route path="/admin/diaries/dark" element={<AdminDiariesRoute />} />
+            <Route path="/admin/diaries/system" element={<AdminDiariesRoute />} />
             <Route path="/admin/diarys" element={<AdminDiariesRoute />} />
-            <Route path="/admin/diarys/:theme" element={<AdminDiariesRoute />} />
+            <Route path="/admin/diarys/light" element={<AdminDiariesRoute />} />
+            <Route path="/admin/diarys/dark" element={<AdminDiariesRoute />} />
+            <Route path="/admin/diarys/system" element={<AdminDiariesRoute />} />
             <Route path="/manage/motivations" element={<AdminMotivationsRoute />} />
             <Route path="/manage/tips" element={<AdminTipsRoute />} />
             <Route path="/manage/users" element={<AdminUsersRoute />} />
