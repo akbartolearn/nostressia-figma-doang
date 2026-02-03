@@ -46,10 +46,10 @@ const logger = createLogger("ADMIN_PAGE");
 
 const adminViewRoutes = {
   dashboard: "/admin",
-  motivation: "/admin/motivations",
-  tips: "/admin/tips",
-  users: "/admin/users",
-  diaries: "/admin/diaries",
+  motivation: "/manage/motivations",
+  tips: "/manage/tips",
+  users: "/manage/users",
+  diaries: "/manage/diaries",
 };
 
 export default function AdminPage({ initialView = "dashboard", initialModal = null }) {
@@ -182,7 +182,10 @@ export default function AdminPage({ initialView = "dashboard", initialModal = nu
   }, [location.pathname, location.search, setViewAndNavigate]);
 
   useEffect(() => {
-    if (location.pathname.startsWith("/admin")) {
+    if (
+      location.pathname.startsWith("/admin") ||
+      location.pathname.startsWith("/manage")
+    ) {
       return;
     }
     setActiveView(initialView);
