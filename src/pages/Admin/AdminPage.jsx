@@ -13,7 +13,7 @@ import {
   Users,
   BookOpen,
 } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   getAdminDiaries,
   getAdminUsers,
@@ -44,16 +44,29 @@ import { createLogger } from "../../utils/logger";
 
 const logger = createLogger("ADMIN_PAGE");
 
-export default function AdminPage({ skipAuth = false }) {
+const adminViewRoutes = {
+  dashboard: "/admin",
+  motivation: "/admin/motivations",
+  tips: "/admin/tips",
+  users: "/admin/users",
+  diaries: "/admin/diaries",
+};
+
+export default function AdminPage({
+  skipAuth = false,
+  initialView = "dashboard",
+  initialModal = null,
+}) {
   const navigate = useNavigate();
+  const location = useLocation();
 
   // --- EXISTING STATE ---
-  const [activeModal, setActiveModal] = useState(null);
+  const [activeModal, setActiveModal] = useState(initialModal);
   const [selectedTipCategory, setSelectedTipCategory] = useState(null);
   const [currentUser, setCurrentUser] = useState({ id: 0, name: "", role: "" });
 
   // --- STATE: VIEWS & DATA ---
-  const [activeView, setActiveView] = useState("dashboard");
+  const [activeView, setActiveView] = useState(initialView);
 
   // User Data
   const [users, setUsers] = useState([]);
@@ -111,6 +124,58 @@ export default function AdminPage({ skipAuth = false }) {
   const handleCancelConfirm = () => {
     setConfirmState((prev) => ({ ...prev, isOpen: false, onConfirm: null }));
   };
+
+  const setViewAndNavigate = useCallback(
+    (nextView) => {
+      if (nextView === "motivation" || nextView === "tips") {
+        setActiveView("dashboard");
+        setActiveModal(nextView);
+      } else {
+        setActiveView(nextView);
+      }
+      if (skipAuth && location.pathname.startsWith("/adm1n")) {
+        return;
+      }
+      const nextPath = adminViewRoutes[nextView] || adminViewRoutes.dashboard;
+      if (location.pathname !== nextPath) {
+        navigate(nextPath);
+      }
+    },
+    [location.pathname, navigate, skipAuth],
+  );
+
+  useEffect(() => {
+    if (location.pathname.startsWith(adminViewRoutes.motivation)) {
+      setActiveView("dashboard");
+      setActiveModal("motivation");
+      return;
+    }
+    if (location.pathname.startsWith(adminViewRoutes.tips)) {
+      setActiveView("dashboard");
+      setActiveModal("tips");
+      return;
+    }
+    if (location.pathname.startsWith(adminViewRoutes.users)) {
+      setActiveView("users");
+      setActiveModal(null);
+      return;
+    }
+    if (location.pathname.startsWith(adminViewRoutes.diaries)) {
+      setActiveView("diaries");
+      setActiveModal(null);
+      return;
+    }
+    setActiveView("dashboard");
+    setActiveModal(null);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    if (location.pathname.startsWith("/admin")) {
+      return;
+    }
+    setActiveView(initialView);
+    setActiveModal(initialModal);
+  }, [initialModal, initialView, location.pathname]);
 
   // Auth gate: load the admin profile or redirect to the login screen.
   useEffect(() => {
@@ -434,6 +499,15 @@ export default function AdminPage({ skipAuth = false }) {
     setEditingTipId(null);
     setEditingTipText("");
     setNewCategoryName("");
+    if (skipAuth && location.pathname.startsWith("/adm1n")) {
+      return;
+    }
+    if (
+      location.pathname.startsWith(adminViewRoutes.motivation) ||
+      location.pathname.startsWith(adminViewRoutes.tips)
+    ) {
+      navigate(adminViewRoutes.dashboard);
+    }
   };
   const activeCategoryData = tipCategories.find((c) => c.id === selectedTipCategory);
   const currentCategoryTips = tipsByCategory[selectedTipCategory] || [];
@@ -591,7 +665,7 @@ export default function AdminPage({ skipAuth = false }) {
             desc: "Manage quotes & authors.",
             color: "orange",
             icon: <Sparkles size={24} />,
-            action: () => setActiveModal("motivation"),
+            action: () => setViewAndNavigate("motivation"),
             btn: "Manage",
           },
           {
@@ -600,7 +674,7 @@ export default function AdminPage({ skipAuth = false }) {
             desc: "Manage tip categories.",
             color: "blue",
             icon: <Lightbulb size={24} />,
-            action: () => setActiveModal("tips"),
+            action: () => setViewAndNavigate("tips"),
             btn: "Manage",
           },
           {
@@ -609,7 +683,7 @@ export default function AdminPage({ skipAuth = false }) {
             desc: "Fix data & manage profiles.",
             color: "purple",
             icon: <Users size={24} />,
-            action: () => setActiveView("users"),
+            action: () => setViewAndNavigate("users"),
             btn: "Manage",
           },
           // ✅ PERBAIKAN: Ganti "rose" menjadi "red" di sini
@@ -619,7 +693,7 @@ export default function AdminPage({ skipAuth = false }) {
             desc: "Delete user diaries.",
             color: "red",
             icon: <BookOpen size={24} />,
-            action: () => setActiveView("diaries"),
+            action: () => setViewAndNavigate("diaries"),
             btn: "Moderate",
           },
         ].map((card, idx) => (
@@ -658,7 +732,7 @@ export default function AdminPage({ skipAuth = false }) {
       <div className="mb-6 flex items-center justify-between">
         <div>
           <button
-            onClick={() => setActiveView("dashboard")}
+            onClick={() => setViewAndNavigate("dashboard")}
             className="flex items-center text-text-muted hover:text-blue-600 mb-2 font-bold transition-colors cursor-pointer"
           >
             <ArrowLeft size={18} className="mr-2" /> Back to Dashboard
@@ -777,7 +851,7 @@ export default function AdminPage({ skipAuth = false }) {
       <div className="mb-6 flex items-center justify-between">
         <div>
           <button
-            onClick={() => setActiveView("dashboard")}
+            onClick={() => setViewAndNavigate("dashboard")}
             className="flex items-center text-text-muted hover:text-blue-600 mb-2 font-bold transition-colors cursor-pointer"
           >
             <ArrowLeft size={18} className="mr-2" /> Back to Dashboard

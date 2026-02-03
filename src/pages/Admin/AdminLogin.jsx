@@ -17,7 +17,7 @@ const logger = createLogger("ADMIN_LOGIN");
 
 export default function AdminLogin() {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({ username: "", password: "" });
+  const [formData, setFormData] = useState({ username: "baraja", password: "baraja123" });
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 

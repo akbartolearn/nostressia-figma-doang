@@ -20,6 +20,13 @@ import NotFound from "../pages/NotFound/NotFound";
 // Import Admin Pages
 import AdminPage from "../pages/Admin/AdminPage";
 import AdminLogin from "../pages/Admin/AdminLogin";
+import {
+  AdminDashboardRoute,
+  AdminDiariesRoute,
+  AdminMotivationsRoute,
+  AdminTipsRoute,
+  AdminUsersRoute,
+} from "../pages/Admin/AdminRoutes";
 
 // Require an admin session for nested routes.
 export const AdminProtectedRoute = () => {
@@ -72,7 +79,11 @@ function AppRouter() {
         </Route>
 
         <Route element={<AdminProtectedRoute />}>
-            <Route path="/admin" element={<AdminPage />} />
+            <Route path="/admin" element={<AdminDashboardRoute />} />
+            <Route path="/admin/motivations" element={<AdminMotivationsRoute />} />
+            <Route path="/admin/tips" element={<AdminTipsRoute />} />
+            <Route path="/admin/users" element={<AdminUsersRoute />} />
+            <Route path="/admin/diaries" element={<AdminDiariesRoute />} />
         </Route>
 
         <Route path="*" element={<NotFound />} />
