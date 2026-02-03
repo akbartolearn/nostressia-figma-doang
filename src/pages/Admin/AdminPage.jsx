@@ -46,6 +46,13 @@ const logger = createLogger("ADMIN_PAGE");
 
 const adminViewRoutes = {
   dashboard: "/admin",
+  motivation: "/admin/motivations",
+  tips: "/admin/tips",
+  users: "/admin/users",
+  diaries: "/admin/diaries",
+};
+
+const adminLegacyRoutes = {
   motivation: "/manage/motivations",
   tips: "/manage/tips",
   users: "/manage/users",
@@ -157,22 +164,35 @@ export default function AdminPage({ initialView = "dashboard", initialModal = nu
       }
     }
 
-    if (location.pathname.startsWith(adminViewRoutes.motivation)) {
+    if (
+      location.pathname.startsWith(adminViewRoutes.motivation) ||
+      location.pathname.startsWith(adminLegacyRoutes.motivation)
+    ) {
       setActiveView("dashboard");
       setActiveModal("motivation");
       return;
     }
-    if (location.pathname.startsWith(adminViewRoutes.tips)) {
+    if (
+      location.pathname.startsWith(adminViewRoutes.tips) ||
+      location.pathname.startsWith(adminLegacyRoutes.tips)
+    ) {
       setActiveView("dashboard");
       setActiveModal("tips");
       return;
     }
-    if (location.pathname.startsWith(adminViewRoutes.users)) {
+    if (
+      location.pathname.startsWith(adminViewRoutes.users) ||
+      location.pathname.startsWith(adminLegacyRoutes.users)
+    ) {
       setActiveView("users");
       setActiveModal(null);
       return;
     }
-    if (location.pathname.startsWith(adminViewRoutes.diaries)) {
+    if (
+      location.pathname.startsWith(adminViewRoutes.diaries) ||
+      location.pathname.startsWith(adminLegacyRoutes.diaries) ||
+      location.pathname.startsWith("/admin/diarys")
+    ) {
       setActiveView("diaries");
       setActiveModal(null);
       return;
