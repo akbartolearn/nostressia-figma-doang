@@ -642,20 +642,11 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen font-sans bg-surface dark:bg-surface text-text-primary dark:text-text-primary overflow-x-hidden selection:bg-brand-accent selection:text-text-inverse">
+    <div className="min-h-screen relative">
       <PageMeta
         title="Landing Page"
         description="Discover Nostressia: track daily stress, reflective journaling, mental wellness tips, and motivation in one app."
       />
-      {/* Background Pattern */}
-      <div
-        className="fixed inset-0 z-0 opacity-[0.4] pointer-events-none"
-        style={{
-          backgroundImage:
-            "radial-gradient(rgb(var(--neutral-200)) 1px, transparent 1px)",
-          backgroundSize: "32px 32px",
-        }}
-      ></div>
 
       {/* --- NEW SPLIT NAVIGATION (Fixed Logo) --- */}
       <SplitNav
