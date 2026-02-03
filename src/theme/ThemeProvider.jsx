@@ -10,6 +10,15 @@ const normalizeTheme = (theme) => {
   return AVAILABLE_THEMES.includes(normalized) ? normalized : "system";
 };
 
+const getUrlThemePreference = () => {
+  if (typeof window === "undefined") return null;
+  const params = new URLSearchParams(window.location.search);
+  const value = params.get("theme");
+  if (!value) return null;
+  const normalized = String(value).toLowerCase();
+  return ["light", "dark", "system"].includes(normalized) ? normalized : null;
+};
+
 const getSystemTheme = () => {
   if (typeof window === "undefined") return "light";
   return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
@@ -31,6 +40,8 @@ const applyResolvedTheme = (preference, resolvedTheme) => {
 export function ThemeProvider({ children }) {
   const [preference, setPreferenceState] = useState(() => {
     if (typeof window === "undefined") return "system";
+    const urlPreference = getUrlThemePreference();
+    if (urlPreference) return urlPreference;
     return normalizeTheme(storage.getItem(STORAGE_KEYS.THEME_PREFERENCE));
   });
   const [resolvedTheme, setResolvedTheme] = useState(() => resolveTheme(preference));
