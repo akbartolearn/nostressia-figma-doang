@@ -134,6 +134,20 @@ export default function AdminPage({ initialView = "dashboard", initialModal = nu
     setConfirmState((prev) => ({ ...prev, isOpen: false, onConfirm: null }));
   };
 
+  const resolveAdminPath = useCallback(
+    (nextView) => {
+      const theme = ["light", "dark", "system"].includes(themePreference)
+        ? themePreference
+        : "system";
+      const basePath = adminViewRoutes[nextView] || adminViewRoutes.dashboard;
+      if (nextView === "dashboard") {
+        return basePath;
+      }
+      return `${basePath}/${theme}`;
+    },
+    [themePreference],
+  );
+
   const setViewAndNavigate = useCallback(
     (nextView) => {
       if (nextView === "motivation" || nextView === "tips") {
@@ -142,12 +156,12 @@ export default function AdminPage({ initialView = "dashboard", initialModal = nu
       } else {
         setActiveView(nextView);
       }
-      const nextPath = adminViewRoutes[nextView] || adminViewRoutes.dashboard;
+      const nextPath = resolveAdminPath(nextView);
       if (location.pathname !== nextPath) {
         navigate(nextPath);
       }
     },
-    [location.pathname, navigate],
+    [location.pathname, navigate, resolveAdminPath],
   );
 
   useEffect(() => {
