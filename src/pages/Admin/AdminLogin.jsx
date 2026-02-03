@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import React, { useEffect, useRef, useState } from "react";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import { Lock, User, ArrowLeft } from "lucide-react";
 import { adminLogin } from "../../services/authService";
 import {
@@ -17,9 +17,36 @@ const logger = createLogger("ADMIN_LOGIN");
 
 export default function AdminLogin() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [formData, setFormData] = useState({ username: "baraja", password: "baraja123" });
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const autoLoginAttempted = useRef(false);
+
+  const resolveNextPath = () => {
+    const params = new URLSearchParams(location.search);
+    const next = params.get("next");
+    if (next && next.startsWith("/admin")) {
+      return next;
+    }
+
+    const view = params.get("view");
+    if (!view) {
+      return "/admin";
+    }
+
+    const normalizedView = view.toLowerCase();
+    const viewRoutes = {
+      dashboard: "/admin",
+      motivation: "/admin/motivations",
+      motivations: "/admin/motivations",
+      tips: "/admin/tips",
+      users: "/admin/users",
+      diaries: "/admin/diaries",
+    };
+
+    return viewRoutes[normalizedView] || "/admin";
+  };
 
   useEffect(() => {
     if (hasAdminSession()) {
@@ -45,7 +72,9 @@ export default function AdminLogin() {
   };
 
   const handleLogin = async (e) => {
-    e.preventDefault();
+    if (e?.preventDefault) {
+      e.preventDefault();
+    }
     setError("");
     setIsLoading(true);
 
@@ -63,7 +92,7 @@ export default function AdminLogin() {
       persistAdminToken(token);
       persistAdminProfile(data.admin);
 
-      navigate("/admin");
+      navigate(resolveNextPath());
     } catch (err) {
       logger.error("Admin login API error:", err);
 
@@ -82,6 +111,15 @@ export default function AdminLogin() {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (autoLoginAttempted.current || hasAdminSession()) {
+      return;
+    }
+
+    autoLoginAttempted.current = true;
+    handleLogin();
+  }, [location.search]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-surface dark:bg-transparent px-4 font-sans text-text-primary">
