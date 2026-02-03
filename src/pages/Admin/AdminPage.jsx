@@ -52,11 +52,7 @@ const adminViewRoutes = {
   diaries: "/admin/diaries",
 };
 
-export default function AdminPage({
-  skipAuth = false,
-  initialView = "dashboard",
-  initialModal = null,
-}) {
+export default function AdminPage({ initialView = "dashboard", initialModal = null }) {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -133,18 +129,34 @@ export default function AdminPage({
       } else {
         setActiveView(nextView);
       }
-      if (skipAuth && location.pathname.startsWith("/adm1n")) {
-        return;
-      }
       const nextPath = adminViewRoutes[nextView] || adminViewRoutes.dashboard;
       if (location.pathname !== nextPath) {
         navigate(nextPath);
       }
     },
-    [location.pathname, navigate, skipAuth],
+    [location.pathname, navigate],
   );
 
   useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const queryView = params.get("view");
+    if (queryView) {
+      const normalizedView = queryView.toLowerCase();
+      const viewMap = {
+        dashboard: "dashboard",
+        motivation: "motivation",
+        motivations: "motivation",
+        tips: "tips",
+        users: "users",
+        diaries: "diaries",
+      };
+      const nextView = viewMap[normalizedView];
+      if (nextView) {
+        setViewAndNavigate(nextView);
+        return;
+      }
+    }
+
     if (location.pathname.startsWith(adminViewRoutes.motivation)) {
       setActiveView("dashboard");
       setActiveModal("motivation");
@@ -167,7 +179,7 @@ export default function AdminPage({
     }
     setActiveView("dashboard");
     setActiveModal(null);
-  }, [location.pathname]);
+  }, [location.pathname, location.search, setViewAndNavigate]);
 
   useEffect(() => {
     if (location.pathname.startsWith("/admin")) {
@@ -179,10 +191,6 @@ export default function AdminPage({
 
   // Auth gate: load the admin profile or redirect to the login screen.
   useEffect(() => {
-    if (skipAuth) {
-      setCurrentUser({ id: 999, name: "Developer Mode", role: "admin" });
-      return;
-    }
     const storedUser = readAdminProfile();
     if (storedUser && typeof storedUser === "object") {
       setCurrentUser(storedUser);
@@ -199,7 +207,7 @@ export default function AdminPage({
     clearAdminSession();
     logger.warn("Redirect to /admin/login because admin token/profile are missing or invalid.");
     navigate("/admin/login");
-  }, [navigate, skipAuth]);
+  }, [navigate]);
 
   const handleLogout = () => {
     clearAdminSession();

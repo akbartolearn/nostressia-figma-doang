@@ -73,7 +73,6 @@ function AppRouter() {
           </Route>
         </Route>
 
-        <Route path="/adm1n" element={<AdminPage skipAuth={true} />} /> 
         <Route element={<AdminPublicRoute />}>
           <Route path="/admin/login" element={<AdminLogin />} /> 
         </Route>
