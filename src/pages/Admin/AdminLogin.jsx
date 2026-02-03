@@ -26,7 +26,7 @@ export default function AdminLogin() {
   const resolveNextPath = () => {
     const params = new URLSearchParams(location.search);
     const next = params.get("next");
-    if (next && next.startsWith("/admin")) {
+    if (next && (next.startsWith("/admin") || next.startsWith("/manage"))) {
       return next;
     }
 
@@ -38,11 +38,11 @@ export default function AdminLogin() {
     const normalizedView = view.toLowerCase();
     const viewRoutes = {
       dashboard: "/admin",
-      motivation: "/admin/motivations",
-      motivations: "/admin/motivations",
-      tips: "/admin/tips",
-      users: "/admin/users",
-      diaries: "/admin/diaries",
+      motivation: "/manage/motivations",
+      motivations: "/manage/motivations",
+      tips: "/manage/tips",
+      users: "/manage/users",
+      diaries: "/manage/diaries",
     };
 
     return viewRoutes[normalizedView] || "/admin";

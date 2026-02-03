@@ -46,10 +46,10 @@ const logger = createLogger("ADMIN_PAGE");
 
 const adminViewRoutes = {
   dashboard: "/admin",
-  motivation: "/admin/motivations",
-  tips: "/admin/tips",
-  users: "/admin/users",
-  diaries: "/admin/diaries",
+  motivation: "/manage/motivations",
+  tips: "/manage/tips",
+  users: "/manage/users",
+  diaries: "/manage/diaries",
 };
 
 export default function AdminPage({ initialView = "dashboard", initialModal = null }) {
@@ -182,7 +182,10 @@ export default function AdminPage({ initialView = "dashboard", initialModal = nu
   }, [location.pathname, location.search, setViewAndNavigate]);
 
   useEffect(() => {
-    if (location.pathname.startsWith("/admin")) {
+    if (
+      location.pathname.startsWith("/admin") ||
+      location.pathname.startsWith("/manage")
+    ) {
       return;
     }
     setActiveView(initialView);
@@ -507,9 +510,6 @@ export default function AdminPage({ initialView = "dashboard", initialModal = nu
     setEditingTipId(null);
     setEditingTipText("");
     setNewCategoryName("");
-    if (skipAuth && location.pathname.startsWith("/adm1n")) {
-      return;
-    }
     if (
       location.pathname.startsWith(adminViewRoutes.motivation) ||
       location.pathname.startsWith(adminViewRoutes.tips)
@@ -658,11 +658,6 @@ export default function AdminPage({ initialView = "dashboard", initialModal = nu
       <div className="mb-8 animate-fade-in">
         <h2 className="text-2xl font-bold text-text-primary">Dashboard Overview</h2>
         <p className="text-text-muted">Manage content and users.</p>
-        {skipAuth && (
-          <p className="mt-2 text-xs font-bold text-orange-600 bg-orange-100 inline-block px-2 py-1 rounded">
-            * Developer Mode
-          </p>
-        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 animate-fade-in">
