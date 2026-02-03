@@ -52,17 +52,21 @@ const adminViewRoutes = {
   diaries: "/admin/diaries",
 };
 
-export default function AdminPage({ skipAuth = false }) {
+export default function AdminPage({
+  skipAuth = false,
+  initialView = "dashboard",
+  initialModal = null,
+}) {
   const navigate = useNavigate();
   const location = useLocation();
 
   // --- EXISTING STATE ---
-  const [activeModal, setActiveModal] = useState(null);
+  const [activeModal, setActiveModal] = useState(initialModal);
   const [selectedTipCategory, setSelectedTipCategory] = useState(null);
   const [currentUser, setCurrentUser] = useState({ id: 0, name: "", role: "" });
 
   // --- STATE: VIEWS & DATA ---
-  const [activeView, setActiveView] = useState("dashboard");
+  const [activeView, setActiveView] = useState(initialView);
 
   // User Data
   const [users, setUsers] = useState([]);
@@ -164,6 +168,14 @@ export default function AdminPage({ skipAuth = false }) {
     setActiveView("dashboard");
     setActiveModal(null);
   }, [location.pathname]);
+
+  useEffect(() => {
+    if (location.pathname.startsWith("/admin")) {
+      return;
+    }
+    setActiveView(initialView);
+    setActiveModal(initialModal);
+  }, [initialModal, initialView, location.pathname]);
 
   // Auth gate: load the admin profile or redirect to the login screen.
   useEffect(() => {
