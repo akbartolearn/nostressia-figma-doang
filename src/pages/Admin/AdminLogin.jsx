@@ -38,11 +38,12 @@ export default function AdminLogin() {
     const normalizedView = view.toLowerCase();
     const viewRoutes = {
       dashboard: "/admin",
-      motivation: "/manage/motivations",
-      motivations: "/manage/motivations",
-      tips: "/manage/tips",
-      users: "/manage/users",
-      diaries: "/manage/diaries",
+      motivation: "/admin/motivations",
+      motivations: "/admin/motivations",
+      tips: "/admin/tips",
+      users: "/admin/users",
+      diaries: "/admin/diaries",
+      diarys: "/admin/diaries",
     };
 
     return viewRoutes[normalizedView] || "/admin";
