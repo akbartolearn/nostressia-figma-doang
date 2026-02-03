@@ -1,6 +1,6 @@
 // src/pages/Dashboard/Dashboard.jsx
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useOutletContext } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import {
   addStressLog,
   getGlobalForecast,
@@ -18,6 +18,7 @@ import PageMeta from "../../components/PageMeta";
 import { clearAuthToken, readAuthToken } from "../../utils/auth";
 import { createLogger } from "../../utils/logger";
 import { resolveLegacyValue, storage, STORAGE_KEYS } from "../../utils/storage";
+import { useTheme } from "../../theme/ThemeProvider";
 
 const logger = createLogger("DASHBOARD");
 
@@ -350,6 +351,9 @@ function buildForecastEligibilityMessage({
 export default function Dashboard() {
   const { user } = useOutletContext() || { user: {} };
   const username = user?.name || "Friend";
+  const navigate = useNavigate();
+  const { resolvedTheme } = useTheme();
+  const isDarkMode = resolvedTheme === "dark";
 
   const today = new Date();
   const TODAY_KEY = formatDate(today);
@@ -768,6 +772,7 @@ export default function Dashboard() {
         if (error?.name === "AbortError") return;
         if (error?.status === 401) {
           clearAuthToken();
+          navigate("/login", { replace: true });
           return;
         }
         const detail = error?.payload?.detail || error?.message;
@@ -776,7 +781,7 @@ export default function Dashboard() {
         setEligibilityLoading(false);
       }
     },
-    [],
+    [navigate],
   );
 
   useEffect(() => {
@@ -994,6 +999,7 @@ export default function Dashboard() {
         if (error?.name === "AbortError") return;
         if (error?.status === 401) {
           clearAuthToken();
+          navigate("/login", { replace: true });
           return;
         }
         const errorEligibility = error?.payload?.errors?.[0]?.eligibility;
@@ -1025,7 +1031,7 @@ export default function Dashboard() {
 
     fetchForecast();
     return () => controller.abort();
-  }, [normalizedEligibility]);
+  }, [navigate, normalizedEligibility]);
 
   function handleOpenForm({ mode = "today", dateKey = TODAY_KEY, restoreMode = "manual" } = {}) {
     if (mode === "restore") {
@@ -1280,17 +1286,18 @@ export default function Dashboard() {
     }
   }
 
-  return (
-    <div
-      style={{
+  const backgroundStyle = isDarkMode
+    ? { minHeight: "100vh", backgroundColor: "transparent" }
+    : {
         minHeight: "100vh",
         backgroundColor: bgSun,
         backgroundImage: `radial-gradient(at 10% 10%, ${bgSun} 0%, transparent 50%), radial-gradient(at 90% 20%, ${bgOrange} 0%, transparent 50%), radial-gradient(at 50% 80%, ${bgSky} 0%, transparent 50%)`,
         backgroundSize: "200% 200%",
         animation: "gradient-bg 20s ease infinite",
-      }}
-      className="relative"
-    >
+      };
+
+  return (
+    <div style={backgroundStyle} className="relative">
       <PageMeta
         title="Dashboard"
         description="Track daily stress, mood predictions, and personal stats on the Nostressia dashboard."
