@@ -56,8 +56,9 @@ export const AdminProtectedRoute = () => {
     return isDevAdminQuery(params);
   }, [location.search]);
 
-  if (!token && shouldBypassAuth) {
+  if (!token) {
     ensureDevAdminSession();
+    return <Outlet />;
   }
 
   if (token || shouldBypassAuth) {
@@ -113,10 +114,15 @@ function AppRouter() {
         <Route element={<AdminProtectedRoute />}>
             <Route path="/admin" element={<AdminDashboardRoute />} />
             <Route path="/admin/motivations" element={<AdminMotivationsRoute />} />
+            <Route path="/admin/motivations/:theme" element={<AdminMotivationsRoute />} />
             <Route path="/admin/tips" element={<AdminTipsRoute />} />
+            <Route path="/admin/tips/:theme" element={<AdminTipsRoute />} />
             <Route path="/admin/users" element={<AdminUsersRoute />} />
+            <Route path="/admin/users/:theme" element={<AdminUsersRoute />} />
             <Route path="/admin/diaries" element={<AdminDiariesRoute />} />
+            <Route path="/admin/diaries/:theme" element={<AdminDiariesRoute />} />
             <Route path="/admin/diarys" element={<AdminDiariesRoute />} />
+            <Route path="/admin/diarys/:theme" element={<AdminDiariesRoute />} />
             <Route path="/manage/motivations" element={<AdminMotivationsRoute />} />
             <Route path="/manage/tips" element={<AdminTipsRoute />} />
             <Route path="/manage/users" element={<AdminUsersRoute />} />

@@ -10,13 +10,22 @@ const normalizeTheme = (theme) => {
   return AVAILABLE_THEMES.includes(normalized) ? normalized : "system";
 };
 
+const parseThemePreference = (value) => {
+  const normalized = String(value || "").toLowerCase();
+  return ["light", "dark", "system"].includes(normalized) ? normalized : null;
+};
+
 const getUrlThemePreference = () => {
   if (typeof window === "undefined") return null;
+  const pathname = window.location.pathname || "";
+  const segments = pathname.split("/").filter(Boolean);
+  const lastSegment = segments[segments.length - 1];
+  const pathTheme = parseThemePreference(lastSegment);
+  if (pathTheme) return pathTheme;
+
   const params = new URLSearchParams(window.location.search);
-  const value = params.get("theme");
-  if (!value) return null;
-  const normalized = String(value).toLowerCase();
-  return ["light", "dark", "system"].includes(normalized) ? normalized : null;
+  const queryTheme = params.get("theme");
+  return parseThemePreference(queryTheme);
 };
 
 const getSystemTheme = () => {
