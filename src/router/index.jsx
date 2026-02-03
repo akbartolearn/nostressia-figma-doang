@@ -73,6 +73,10 @@ function AppRouter() {
 
         <Route element={<AdminProtectedRoute />}>
             <Route path="/admin" element={<AdminPage />} />
+            <Route path="/admin/motivations" element={<AdminPage />} />
+            <Route path="/admin/tips" element={<AdminPage />} />
+            <Route path="/admin/users" element={<AdminPage />} />
+            <Route path="/admin/diaries" element={<AdminPage />} />
         </Route>
 
         <Route path="*" element={<NotFound />} />
