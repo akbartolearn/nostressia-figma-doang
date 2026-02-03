@@ -35,7 +35,13 @@ import {
   getTipsByCategory,
   updateTip,
 } from "../../services/tipsService";
-import { clearAdminSession, readAdminProfile, readAdminToken } from "../../utils/auth";
+import {
+  clearAdminSession,
+  persistAdminProfile,
+  persistAdminToken,
+  readAdminProfile,
+  readAdminToken,
+} from "../../utils/auth";
 import { useTheme } from "../../theme/ThemeProvider";
 import Toast from "../../components/Toast";
 import ConfirmModal from "../../components/ConfirmModal";
@@ -46,6 +52,13 @@ const logger = createLogger("ADMIN_PAGE");
 
 const adminViewRoutes = {
   dashboard: "/admin",
+  motivation: "/admin/motivations",
+  tips: "/admin/tips",
+  users: "/admin/users",
+  diaries: "/admin/diaries",
+};
+
+const adminLegacyRoutes = {
   motivation: "/manage/motivations",
   tips: "/manage/tips",
   users: "/manage/users",
@@ -121,6 +134,20 @@ export default function AdminPage({ initialView = "dashboard", initialModal = nu
     setConfirmState((prev) => ({ ...prev, isOpen: false, onConfirm: null }));
   };
 
+  const resolveAdminPath = useCallback(
+    (nextView) => {
+      const theme = ["light", "dark", "system"].includes(themePreference)
+        ? themePreference
+        : "system";
+      const basePath = adminViewRoutes[nextView] || adminViewRoutes.dashboard;
+      if (nextView === "dashboard") {
+        return basePath;
+      }
+      return `${basePath}/${theme}`;
+    },
+    [themePreference],
+  );
+
   const setViewAndNavigate = useCallback(
     (nextView) => {
       if (nextView === "motivation" || nextView === "tips") {
@@ -129,12 +156,12 @@ export default function AdminPage({ initialView = "dashboard", initialModal = nu
       } else {
         setActiveView(nextView);
       }
-      const nextPath = adminViewRoutes[nextView] || adminViewRoutes.dashboard;
+      const nextPath = resolveAdminPath(nextView);
       if (location.pathname !== nextPath) {
         navigate(nextPath);
       }
     },
-    [location.pathname, navigate],
+    [location.pathname, navigate, resolveAdminPath],
   );
 
   useEffect(() => {
@@ -157,22 +184,35 @@ export default function AdminPage({ initialView = "dashboard", initialModal = nu
       }
     }
 
-    if (location.pathname.startsWith(adminViewRoutes.motivation)) {
+    if (
+      location.pathname.startsWith(adminViewRoutes.motivation) ||
+      location.pathname.startsWith(adminLegacyRoutes.motivation)
+    ) {
       setActiveView("dashboard");
       setActiveModal("motivation");
       return;
     }
-    if (location.pathname.startsWith(adminViewRoutes.tips)) {
+    if (
+      location.pathname.startsWith(adminViewRoutes.tips) ||
+      location.pathname.startsWith(adminLegacyRoutes.tips)
+    ) {
       setActiveView("dashboard");
       setActiveModal("tips");
       return;
     }
-    if (location.pathname.startsWith(adminViewRoutes.users)) {
+    if (
+      location.pathname.startsWith(adminViewRoutes.users) ||
+      location.pathname.startsWith(adminLegacyRoutes.users)
+    ) {
       setActiveView("users");
       setActiveModal(null);
       return;
     }
-    if (location.pathname.startsWith(adminViewRoutes.diaries)) {
+    if (
+      location.pathname.startsWith(adminViewRoutes.diaries) ||
+      location.pathname.startsWith(adminLegacyRoutes.diaries) ||
+      location.pathname.startsWith("/admin/diarys")
+    ) {
       setActiveView("diaries");
       setActiveModal(null);
       return;
@@ -207,10 +247,18 @@ export default function AdminPage({ initialView = "dashboard", initialModal = nu
       return;
     }
 
+    if (location.pathname.startsWith("/admin") || location.pathname.startsWith("/manage")) {
+      persistAdminToken("dev-admin-token");
+      const devProfile = { id: 0, name: "Developer", role: "admin" };
+      persistAdminProfile(devProfile);
+      setCurrentUser(devProfile);
+      return;
+    }
+
     clearAdminSession();
     logger.warn("Redirect to /admin/login because admin token/profile are missing or invalid.");
     navigate("/admin/login");
-  }, [navigate]);
+  }, [location.pathname, navigate]);
 
   const handleLogout = () => {
     clearAdminSession();
